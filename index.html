@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>3D Maze</title>
+<style>
+body{margin:0;overflow:hidden;}
+</style>
+</head>
+
+<body>
+
+<script type="module">
+
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js";
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+);
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+camera.position.set(1,1.6,1);
+
+const light = new THREE.HemisphereLight(0xffffff,0x444444,1);
+scene.add(light);
+
+const wallGeo = new THREE.BoxGeometry(1,2,1);
+const wallMat = new THREE.MeshStandardMaterial({color:0x00ffff});
+
+const maze = [
+"1111111111",
+"1000000001",
+"1011111101",
+"1010000101",
+"1010110101",
+"1010000001",
+"1111111111"
+];
+
+for(let z=0; z<maze.length; z++){
+for(let x=0; x<maze[z].length; x++){
+
+if(maze[z][x]=="1"){
+const wall = new THREE.Mesh(wallGeo,wallMat);
+wall.position.set(x,1,z);
+scene.add(wall);
+}
+
+}
+}
+
+const floorGeo = new THREE.PlaneGeometry(50,50);
+const floorMat = new THREE.MeshStandardMaterial({color:0x333333});
+const floor = new THREE.Mesh(floorGeo,floorMat);
+floor.rotation.x = -Math.PI/2;
+scene.add(floor);
+
+const keys={};
+
+document.addEventListener("keydown",e=>keys[e.key]=true);
+document.addEventListener("keyup",e=>keys[e.key]=false);
+
+function move(){
+
+const speed=0.05;
+
+if(keys["w"]) camera.position.z-=speed;
+if(keys["s"]) camera.position.z+=speed;
+if(keys["a"]) camera.position.x-=speed;
+if(keys["d"]) camera.position.x+=speed;
+
+}
+
+function animate(){
+requestAnimationFrame(animate);
+
+move();
+
+renderer.render(scene,camera);
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
